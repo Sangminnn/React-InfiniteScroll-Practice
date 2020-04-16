@@ -1,68 +1,62 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## React 기반의 Infinite Scroll 구현 project
 
-## Available Scripts
 
-In the project directory, you can run:
+### 진행상황
 
-### `yarn start`
+간단한 layout을 만들어 grid-box로 image를 배치시키고 추후 프로젝트 진행시에 적용하고싶었던 기능들을 하나씩 넣어보는 중
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+### 2020.04.15
 
-### `yarn test`
+IntersectionObserver 에 대한 소개글을 보고 이를 적용
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```js
+// containers/MainContainer.js
 
-### `yarn build`
+const [target, setTarget] = useState(null);
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+// ...
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+const addImage = () => {
+    return setPictures([
+      ...pictures,
+      ...pictures
+    ]);
+  };
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+  useEffect(() => {
+    let observer;
+    if (target) {
+      observer = new IntersectionObserver(onIntersect, { threshold: 1 });
+      observer.observe(target);
+    }
+  }, [target]);
 
-### `yarn eject`
+  const onIntersect = ([ entry ]) => {
+    if(entry.isIntersecting) {
+      setOnload(false);
+      addImage();
+      setOnload(true);
+    }
+  }
+  
+  //  ...
+  return (
+    // ... 
+    {onload && <Target ref={setTarget}></Target>}
+  )
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+현재는 server단에서의 loading이 아니기 때문에 useState의 setState를 사용하여 교차 이벤트 발생 시에 addImage를 발생.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+교차 이벤트 발생 포인트는 component들의 최하단에 target 을 두고 이를 toggle 하여 addImage 발생시에 다시 event listening 상태로 만들어 줌.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+### 2020.04.16 
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+develop branch 를 만들어 공부하고있는 GraphQL 을 적용시켜봄.
 
-## Learn More
+Apollo Client와 GraphQL을 활용하면 Redux를 대체할 수 있다는 글을 보고, local state를 대체하기 위해 시도 중 ..
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+cache와 Query를 활용해 값을 불러오는 동작은 성공
 
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `yarn build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+Mutation을 통한 addImage 동작은 아직 진행중 ...
