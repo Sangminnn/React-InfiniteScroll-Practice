@@ -4,7 +4,6 @@ import { Picture, ImageList } from 'components/Base/MyMain';
 import gql from 'graphql-tag';
 import { useQuery, useMutation } from "@apollo/react-hooks";
 
-
 const GET_PICTURES = gql`
   query GetPictures {
     pictures @client {
@@ -14,9 +13,13 @@ const GET_PICTURES = gql`
   }
 `;
 
+// pictures 의 인자로 object array가 들어와야하는데
+// 이에 대한 type 설정을 gql을 사용해서 어떻게 해야할지?
+// in react 에서 
+
 // const LOAD_PICTURES = gql`
-//   mutation LoadPictures {
-//     pictures @client {
+//   mutation LoadPictures($image: String, $title: String) {
+//     pictures(image: $image, title: $title) {
 //       image
 //       title
 //     }
@@ -26,29 +29,26 @@ const GET_PICTURES = gql`
 function MainContainer() {
 
   const { data } = useQuery(GET_PICTURES);
-  
-  // const updateCache = (cache, {data}) => {
-  //   // const existingDatas = cache.readQuery({
-  //   //   query: GET_PICTURES
-  //   // });
-  //   const newthing = data.pictures;
-    
-  //   cache.writeQuery({
-  //     query: GET_PICTURES,
-  //     data: {pictures: [...newthing, ...newthing]}
-  //   })
-  // }
 
-  // const [loadPictures] = useMutation(LOAD_PICTURES, {update: updateCache});
+  const [loadPictures] = useMutation(LOAD_PICTURES,
+    {
+    // update의 인자로 오는 data는 update mutation 이 적용된 data
+    update(cache) {
+      const newItems = cache.readQuery({ query: GET_PICTURES });
+      cache.writeQuery({
+        query: GET_PICTURES,
+        data: { pictures: newItems }
+      })
+    }
+  });
 
   useEffect(() => {
     console.log(data);
   }, [data]);
 
-  // const [target, setTarget] = useState(null);
-  // const target = useRef(null);
+  const [target, setTarget] = useState(null);
 
-  // const [onload, setOnload] = useState(true);
+  const [onload, setOnload] = useState(true);
 
   // const [pictures, setPictures] = useState([
   //   { image: 'prac4.jpg', title: 'hello'  },
@@ -72,7 +72,7 @@ function MainContainer() {
   //   { image: 'prac2.jpg', title: 'hello'  },
   //   { image: 'prac6.jpg', title: 'hello'  },
   //   { image: 'prac3.jpg', title: 'hello'  },
-  //   { image: 'prac5.jpg', title: 'hello'  },
+    // { image: 'prac5.jpg', title: 'hello'  },
   // ]);
 
   // const addImage = () => {
@@ -82,21 +82,21 @@ function MainContainer() {
   //   ]);
   // };
 
-  // useEffect(() => {
-  //   let observer;
-  //   if (target) {
-  //     observer = new IntersectionObserver(onIntersect, { threshold: 1 });
-  //     observer.observe(target);
-  //   }
-  // }, [target]);
+  useEffect(() => {
+    let observer;
+    if (target) {
+      observer = new IntersectionObserver(onIntersect, { threshold: 1 });
+      observer.observe(target);
+    }
+  }, [target]);
 
-  // const onIntersect = ([ entry ]) => {
-  //   if(entry.isIntersecting) {
-  //     setOnload(false);
-  //     loadPictures();
-  //     setOnload(true);
-  //   }
-  // }
+  const onIntersect = ([ entry ]) => {
+    if(entry.isIntersecting) {
+      setOnload(false);
+      loadPictures();
+      setOnload(true);
+    }
+  }
   
 
   // const pictureList = pictures.map(
@@ -121,7 +121,7 @@ function MainContainer() {
           picture => (<Picture src={picture.image} title={picture.title}/>)
         )}
       </ImageList>
-      {/* {onload && <Target ref={setTarget}></Target>} */}
+      {onload && <Target ref={setTarget}></Target>}
     </>
   )
 };

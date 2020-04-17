@@ -19,16 +19,18 @@ const typeDefs = gql`
     pictures: [Picture]
   }
 
+  type Mutation {
+    LoadPictures(image: String, title: String): Picture
+  }
+
   type Picture {
     __typename: String
     image: String
     tilte: String
   }
-
-  type Mutation {
-    pictures: [Picture]
-  }
 `
+
+// const typeRe
 
 // picture의 배열이라는 것을 암시
 
