@@ -1,44 +1,53 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Picture, ImageList } from 'components/Base/MyMain';
+import gql from 'graphql-tag';
+import { useQuery, useMutation } from "@apollo/react-hooks";
+
+const GET_PICTURES = gql`
+  query getPictures {
+    pictures @client {  
+      image
+      title
+    }
+  }
+`;
+
+// __typename: $__typename, image: $image, title: $title
+const ADD_PICTURES = gql`
+  mutation addPicture {
+    addPicture @client {
+      __typename
+      image
+      title
+    }
+  }
+`;
+
+// case 2
+// const ADD_PICTURES = gql`
+//   mutation addPicture($__typename: __typename, $image: image, $title: title) {
+//     addPicture(__typename: $__typename, image: $image, title: $title) @client {
+//       image
+//       title
+//     }
+//   }
+// `;
 
 function MainContainer() {
+
+  const { data } = useQuery(GET_PICTURES);
+
+  const [addPicture] = useMutation(ADD_PICTURES);
+
+  useEffect(() => {
+    console.log(data);
+  }, [data]);
+
   const [target, setTarget] = useState(null);
-  // const target = useRef(null);
 
   const [onload, setOnload] = useState(true);
 
-  const [pictures, setPictures] = useState([
-    { image: 'prac4.jpg', title: 'hello'  },
-    { image: 'prac2.jpg', title: 'hello'  },
-    { image: 'prac5.jpg', title: 'hello'  },
-    { image: 'prac4.jpg', title: 'hello'  },
-    { image: 'prac6.jpg', title: 'hello'  },
-    { image: 'prac2.jpg', title: 'hello'  },
-    { image: 'prac1.jpg', title: 'hello'  },
-    { image: 'prac2.jpg', title: 'hello'  },
-    { image: 'prac4.jpg', title: 'hello'  },
-    { image: 'prac5.jpg', title: 'hello'  },
-    { image: 'prac2.jpg', title: 'hello'  },
-    { image: 'prac6.jpg', title: 'hello'  },
-    { image: 'prac3.jpg', title: 'hello'  },
-    { image: 'prac5.jpg', title: 'hello'  },
-    { image: 'prac2.jpg', title: 'hello'  },
-    { image: 'prac1.jpg', title: 'hello'  },
-    { image: 'prac4.jpg', title: 'hello'  },
-    { image: 'prac3.jpg', title: 'hello'  },
-    { image: 'prac2.jpg', title: 'hello'  },
-    { image: 'prac6.jpg', title: 'hello'  },
-    { image: 'prac3.jpg', title: 'hello'  },
-    { image: 'prac5.jpg', title: 'hello'  },
-  ]);
-
-  const addImage = () => {
-    return setPictures([
-      ...pictures,
-      ...pictures
-    ]);
-  };
 
   useEffect(() => {
     let observer;
@@ -51,20 +60,17 @@ function MainContainer() {
   const onIntersect = ([ entry ]) => {
     if(entry.isIntersecting) {
       setOnload(false);
-      addImage();
+      addPicture();
       setOnload(true);
     }
   }
-  
-
-  const pictureList = pictures.map(
-    picture => (<Picture src={picture.image} title={picture.title}/>)
-  );
 
   return (
     <>
       <ImageList>
-        { pictureList }
+        {data.pictures.map(
+          picture => (<Picture src={picture.image} title={picture.title}/>)
+        )}
       </ImageList>
       {onload && <Target ref={setTarget}></Target>}
     </>

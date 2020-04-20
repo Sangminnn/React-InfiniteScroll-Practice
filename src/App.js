@@ -3,10 +3,8 @@ import { Route } from 'react-router-dom';
 import { createGlobalStyle } from 'styled-components';
 
 import { MyHeader } from 'components/Base/MyHeader';
-import { MainContainer } from 'containers';
 
 import { Home } from 'pages';
-// import HeaderContainer 
 
 const GlobalStyle = createGlobalStyle`
   body {
