@@ -60,3 +60,16 @@ Apollo Client와 GraphQL을 활용하면 Redux를 대체할 수 있다는 글을
 cache와 Query를 활용해 값을 불러오는 동작은 성공
 
 Mutation을 통한 addImage 동작은 아직 진행중 ...
+
+
+### 2020.04.20
+
+Mutation을 통한 addImage 동작 구현 완료.
+
+하지만 MainContainer에서 직접 data를 가지고 오는 구조는 gql 사용시에 custom type 사용법에 대한 문제를 해결하지 못해 보류.
+
+그에 대한 대안으로 index.js에서 mutation 동작 시에 실행할 내용에 대한 resolver에서 new Image를 임의로 정의한 후
+
+기존의 Cache state에 내용을 추가해주는 방식을 채택.
+
+위의 보류한 방법에 대해서는 계속 찾아볼 예정.
