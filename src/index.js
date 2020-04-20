@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import './index.css';
 import { BrowserRouter, Route } from 'react-router-dom';
 import gql from 'graphql-tag';
 
@@ -15,42 +14,94 @@ import * as serviceWorker from './serviceWorker';
 const cache = new InMemoryCache();
 
 const typeDefs = gql`
+  type Picture {
+    __typename: String!
+    image: String!
+    title: String!
+  }
+
   type Query {
-    pictures: [Picture]
+    pictures: [Picture!]!
   }
 
   type Mutation {
-    LoadPictures(image: String, title: String): Picture
+    addPicture(input: [Picture]): [Picture]!
   }
+`;
 
-  type Picture {
-    __typename: String
-    image: String
-    tilte: String
+
+const resolvers = {
+  Mutation: {
+    addPicture: (_, args, { cache }) => {
+      
+      const newthing = [
+        { __typename: "Picture", image: 'prac1.jpg', title: 'hello'  },
+        { __typename: "Picture", image: 'prac2.jpg', title: 'hello'  },
+        { __typename: "Picture", image: 'prac3.jpg', title: 'hello'  },
+        { __typename: "Picture", image: 'prac4.jpg', title: 'hello'  },
+        { __typename: "Picture", image: 'prac5.jpg', title: 'hello'  },
+        { __typename: "Picture", image: 'prac6.jpg', title: 'hello'  }
+      ];
+
+      const query = gql`
+        query pictures {
+          pictures @client {
+            __typename
+            image
+            title
+          }
+        }
+      `
+
+      const previous = cache.readQuery({ query });
+      const data = {
+        pictures: [...previous.pictures, ...newthing]
+      }
+
+      cache.writeQuery({ query, data });
+      return data;
+    }
+    // addPicture: (_, variables, { cache }) => {
+      // const query = gql`
+      //   query pictures {
+      //     pictures @client {
+      //       __typename
+      //       image
+      //       title
+      //     }
+      //   }
+      // `
+
+      // const previous = cache.readQuery({ query });
+      // const newPicture = { __typename, image, title };
+      // const data = {
+      //   pictures: [...previous.pictures, newPicture]
+      // }
+      
+      // cache.writeQuery({ query, data })
+      // return newPicture;
+    // }
   }
-`
-
-// const typeRe
-
-// picture의 배열이라는 것을 암시
+};
 
 const client = new ApolloClient({
   cache,
   link: new HttpLink({
     uri: 'http://localhost:4000'
   }),
-  typeDefs
+  typeDefs,
+  resolvers
 });
 
 cache.writeData({
   data: {
-    // picture: { __typename: "Picture", image: 'prac6.jpg', title: 'hello'  },
     pictures: [
       { __typename: "Picture", image: 'prac4.jpg', title: 'hello'  },
       { __typename: "Picture", image: 'prac2.jpg', title: 'hello'  },
       { __typename: "Picture", image: 'prac5.jpg', title: 'hello'  },
       { __typename: "Picture", image: 'prac4.jpg', title: 'hello'  },
       { __typename: "Picture", image: 'prac6.jpg', title: 'hello'  },
+      { __typename: "Picture", image: 'prac6.jpg', title: 'hello'  }
     ]
   }
 })
