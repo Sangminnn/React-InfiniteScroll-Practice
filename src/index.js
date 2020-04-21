@@ -15,7 +15,6 @@ const cache = new InMemoryCache();
 
 const typeDefs = gql`
   type Picture {
-    __typename: String!
     image: String!
     title: String!
   }
@@ -44,9 +43,8 @@ const resolvers = {
       ];
 
       const query = gql`
-        query pictures {
+        query getPictures {
           pictures @client {
-            __typename
             image
             title
           }
@@ -61,26 +59,6 @@ const resolvers = {
       cache.writeQuery({ query, data });
       return data;
     }
-    // addPicture: (_, variables, { cache }) => {
-      // const query = gql`
-      //   query pictures {
-      //     pictures @client {
-      //       __typename
-      //       image
-      //       title
-      //     }
-      //   }
-      // `
-
-      // const previous = cache.readQuery({ query });
-      // const newPicture = { __typename, image, title };
-      // const data = {
-      //   pictures: [...previous.pictures, newPicture]
-      // }
-      
-      // cache.writeQuery({ query, data })
-      // return newPicture;
-    // }
   }
 };
 
@@ -96,7 +74,7 @@ const client = new ApolloClient({
 cache.writeData({
   data: {
     pictures: [
-      { __typename: "Picture", image: 'prac4.jpg', title: 'hello'  },
+      { __typename: "Picture", image: 'prac1.jpg', title: 'hello'  },
       { __typename: "Picture", image: 'prac2.jpg', title: 'hello'  },
       { __typename: "Picture", image: 'prac5.jpg', title: 'hello'  },
       { __typename: "Picture", image: 'prac4.jpg', title: 'hello'  },
